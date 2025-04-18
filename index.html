@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fantasy Widget – Notatki i Zadania</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Lato&display=swap" rel="stylesheet">  <link rel="stylesheet" href="styles.css" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="theme-color" content="#a67c52" />
+</head>
+<body>
+  <main>
+    <section class="card" id="notes-section">
+        <h2>📜 Notatki</h2>
+        <button id="add-note-btn">+ Utwórz nową notatkę</button>
+        <ul id="notes-list" style="margin-top: 1rem;"></ul>
+        <div id="note-preview" style="margin-top: 1rem;"></div>
+      </section>
+      
+      <!-- Fullscreen Modal -->
+      <div id="note-modal" class="modal">
+        <div class="modal-content">
+          <span id="close-modal" class="close-btn">&times;</span>
+          <h3 class="modal-title">Nowa Notatka</h3>
+          <input type="text" id="modal-note-title" placeholder="Tytuł notatki" />
+          <textarea id="modal-note-content" placeholder="Treść notatki"></textarea>
+          <button id="modal-save-btn">Zapisz</button>
+        </div>
+      </div>
+
+<!-- Podgląd i edycja notatki -->
+<div id="view-modal" class="modal">
+    <div class="modal-content" id="view-mode">
+      <span id="close-view-modal" class="close-btn">&times;</span>
+      
+      <input type="text" id="view-note-title" readonly />
+      <div id="view-note-content" class="view-only"></div>
+      
+      <button id="edit-note-btn">Edytuj</button>
+      <button id="delete-note-btn" style="margin-left: 0.5rem; background-color: #8b1e1e;">Usuń</button>
+    </div>
+  </div>
+
+  <!-- Tryb edycji -->
+<div id="edit-modal" class="modal">
+    <div class="modal-content">
+      <span id="close-edit-modal" class="close-btn">&times;</span>
+      
+      <input type="text" id="edit-note-title" />
+      <textarea id="edit-note-content"></textarea>
+      <button id="save-edit-btn">Zapisz zmiany</button>
+    </div>
+  </div>
+      
+
+<!-- Zadania -->
+<section class="card" id="one-time-tasks">
+    <h2>📌 Zadania jednorazowe</h2>
+    <ul id="one-time-list"></ul>
+    <button id="add-one-time-task-btn">+ Dodaj zadanie</button>
+  </section>
+  
+  <section class="card" id="daily-tasks">
+    <h2>🔁 Zadania codzienne</h2>
+    <ul id="daily-list"></ul>
+    <button id="add-daily-task-btn">+ Dodaj zadanie</button>
+  </section>
+  
+
+  <footer>
+    &copy; 2025 Twoje Imię – Projekt w stylu Hearthstone 🔥
+  </footer>
+  <script src="script.js"></script>
+  <script src="script2.js"></script>
+</body>
+</html>
