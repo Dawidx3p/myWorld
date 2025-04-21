@@ -23,12 +23,16 @@ const saveEditBtn = document.getElementById("save-edit-btn");
 
 const notesList = document.getElementById("notes-list");
 let currentNoteId = null;
+let activeNoteId = null;
 
 addNoteBtn.addEventListener("click", () => {
-  modalNoteTitle.value = "";
-  modalNoteContent.value = "";
-  noteModal.style.display = "flex";
-});
+    modalNoteTitle.value = "";
+    modalNoteContent.value = "";
+    noteModal.style.display = "flex";
+  
+    // 👉 Automatyczny focus na tytuł
+    setTimeout(() => modalNoteTitle.focus(), 10);
+  });
 
 closeNoteModal.addEventListener("click", () => noteModal.style.display = "none");
 
@@ -49,12 +53,32 @@ saveNoteBtn.addEventListener("click", async () => {
 async function loadNotes() {
   const res = await fetch(`${API_BASE}/notes`);
   const notes = await res.json();
+  renderNotes(notes);
+}
+
+function renderNotes(notes) {
   notesList.innerHTML = "";
   notes.forEach(note => {
-    const li = document.createElement("li");
-    li.textContent = note.title;
-    li.addEventListener("click", () => openViewNote(note));
-    notesList.appendChild(li);
+    const icon = document.createElement("div");
+    icon.className = "note-icon";
+    icon.setAttribute("data-title", note.title);
+    icon.textContent = "📄";
+
+    icon.addEventListener("click", () => {
+      if (activeNoteId === note.id) {
+        openViewNote(note); // klik 2 – otwórz notatkę
+        activeNoteId = null;
+      } else {
+        activeNoteId = note.id; // klik 1 – pokaż tytuł
+        renderNotes(notes);     // odśwież z nowym aktywnym ID
+      }
+    });
+
+    if (activeNoteId === note.id) {
+      icon.classList.add("active");
+    }
+
+    notesList.appendChild(icon);
   });
 }
 
@@ -107,30 +131,40 @@ addOneTimeBtn.addEventListener("click", () => createTaskInput("one-time", oneTim
 addDailyBtn.addEventListener("click", () => createTaskInput("daily", dailyList));
 
 function createTaskInput(type, listEl) {
-  const row = document.createElement("div");
-  row.className = "task-input-row";
-
-  const input = document.createElement("input");
-  input.placeholder = "Wpisz treść zadania";
-
-  const btn = document.createElement("button");
-  btn.textContent = "Zapisz";
-
-  btn.addEventListener("click", async () => {
-    const text = input.value.trim();
-    if (!text) return;
-    await fetch(`${API_BASE}/tasks`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, type })
+    const row = document.createElement("div");
+    row.className = "task-input-row";
+  
+    const input = document.createElement("input");
+    input.placeholder = "Wpisz treść zadania";
+  
+    const btn = document.createElement("button");
+    btn.textContent = "Zapisz";
+  
+    const saveTask = async () => {
+      const text = input.value.trim();
+      if (!text) return;
+      await fetch(`${API_BASE}/tasks`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, type })
+      });
+      loadTasks();
+    };
+  
+    btn.addEventListener("click", saveTask);
+  
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        saveTask();
+      }
     });
-    loadTasks();
-  });
-
-  row.appendChild(input);
-  row.appendChild(btn);
-  listEl.prepend(row);
-}
+  
+    row.appendChild(input);
+    row.appendChild(btn);
+    listEl.prepend(row);
+    input.focus();
+  }
 
 async function loadTasks() {
   const oneTime = await (await fetch(`${API_BASE}/tasks?type=one-time`)).json();
