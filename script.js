@@ -25,6 +25,16 @@ const notesList = document.getElementById("notes-list");
 let currentNoteId = null;
 let activeNoteId = null;
 
+const loadingScreen = document.getElementById("loading-screen");
+
+function showLoading() {
+  loadingScreen.style.display = "flex";
+}
+
+function hideLoading() {
+  loadingScreen.style.display = "none";
+}
+
 addNoteBtn.addEventListener("click", () => {
     modalNoteTitle.value = "";
     modalNoteContent.value = "";
@@ -51,34 +61,44 @@ saveNoteBtn.addEventListener("click", async () => {
 });
 
 async function loadNotes() {
+  showLoading();
   const res = await fetch(`${API_BASE}/notes`);
   const notes = await res.json();
   renderNotes(notes);
+  hideLoading();
 }
 
 function renderNotes(notes) {
   notesList.innerHTML = "";
   notes.forEach(note => {
     const icon = document.createElement("div");
-    icon.className = "note-icon";
-    icon.setAttribute("data-title", note.title);
-    icon.textContent = "📄";
+icon.className = "note-icon";
 
-    icon.addEventListener("click", () => {
-      if (activeNoteId === note.id) {
-        openViewNote(note); // klik 2 – otwórz notatkę
-        activeNoteId = null;
-      } else {
-        activeNoteId = note.id; // klik 1 – pokaż tytuł
-        renderNotes(notes);     // odśwież z nowym aktywnym ID
-      }
-    });
+// symbol notatki
+icon.textContent = "📄";
 
-    if (activeNoteId === note.id) {
-      icon.classList.add("active");
-    }
+// overlay z tytułem
+const titleOverlay = document.createElement("div");
+titleOverlay.className = "note-icon-title";
+titleOverlay.textContent = note.title;
+icon.appendChild(titleOverlay);
 
-    notesList.appendChild(icon);
+// klik = pierwszy pokazuje, drugi otwiera
+icon.addEventListener("click", () => {
+  if (activeNoteId === note.id) {
+    openViewNote(note); // klik 2
+    activeNoteId = null;
+  } else {
+    activeNoteId = note.id; // klik 1
+    renderNotes(notes);     // odśwież widok z aktywnym
+  }
+});
+
+if (activeNoteId === note.id) {
+  icon.classList.add("active");
+}
+
+notesList.appendChild(icon);
   });
 }
 
@@ -166,13 +186,14 @@ function createTaskInput(type, listEl) {
     input.focus();
   }
 
-async function loadTasks() {
-  const oneTime = await (await fetch(`${API_BASE}/tasks?type=one-time`)).json();
-  const daily = await (await fetch(`${API_BASE}/tasks?type=daily`)).json();
-
-  renderTaskList(oneTime, oneTimeList, "one-time");
-  renderTaskList(daily, dailyList, "daily");
-}
+  async function loadTasks() {
+    showLoading();
+    const oneTime = await (await fetch(`${API_BASE}/tasks?type=one-time`)).json();
+    const daily = await (await fetch(`${API_BASE}/tasks?type=daily`)).json();
+    renderTaskList(oneTime, oneTimeList, "one-time");
+    renderTaskList(daily, dailyList, "daily");
+    hideLoading();
+  }
 
 function renderTaskList(tasks, listEl, type) {
   listEl.innerHTML = "";
