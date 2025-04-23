@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Fantasy Widget – Notatki i Zadania</title>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Lato&display=swap" rel="stylesheet">  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icon-192.png">
   <meta name="theme-color" content="#a67c52" />
@@ -15,12 +16,14 @@
   <p>Ładowanie danych z serwera...</p>
 </div>
   <main>
+    <div id="scroll-container">
+      <!-- 📄 Główny ekran -->
+      <div class="panel" id="main-screen">
     <section class="card" id="notes-section">
-        <h2>📜 Notatki</h2>
-        <button id="add-note-btn">+ Utwórz nową notatkę</button>
-        <ul id="notes-list" style="margin-top: 1rem;"></ul>
-        <div id="note-preview" style="margin-top: 1rem;"></div>
-      </section>
+      <h2>📜 Notatki</h2>
+      <ul id="notes-list"></ul>
+      <button id="add-note-btn">+ Utwórz nową</button>
+    </section>
       
       <!-- Fullscreen Modal -->
       <div id="note-modal" class="modal">
@@ -61,16 +64,43 @@
 <!-- Zadania -->
 <section class="card" id="one-time-tasks">
     <h2>📌 Zadania jednorazowe</h2>
-    <ul id="one-time-list"></ul>
+    <ul id="one-time-list" class="compact-task-font"></ul>
     <button id="add-one-time-task-btn">+ Dodaj zadanie</button>
   </section>
   
   <section class="card" id="daily-tasks">
     <h2>🔁 Zadania codzienne</h2>
-    <ul id="daily-list"></ul>
+    <ul id="daily-list" class="compact-task-font"></ul>
     <button id="add-daily-task-btn">+ Dodaj zadanie</button>
   </section>
-  
+      </div>
+      <div class="panel" id="stats-screen">
+        <section class="card" style="text-align: center;">
+          <h2>📈 Statystyki</h2>
+          <p>Zrobione zadania: <strong id="stats-done">0</strong></p>
+          <p>Utworzone notatki: <strong id="stats-notes">0</strong></p>
+          <p>Codzienna seria: <strong id="daily-streak">🔥 0 dni</strong></p>
+          <p style="margin-top: 1rem; font-style: italic; opacity: 0.8;">
+            „Jesteś na dobrej drodze, bohaterze.”
+          </p>
+        </section>
+      </div>
+      <div class="panel" id="calendar-screen">
+        <section class="card calendar-card">
+          <h2>📅 Kalendarz Google</h2>
+          <div class="calendar-wrapper">
+            <iframe
+              src="https://calendar.google.com/calendar/embed?src=dawiddebiecx%40gmail.com&ctz=Europe%2FWarsaw&mode=AGENDA"
+              style="border:0;"
+              width="100%"
+              height="100%"
+              frameborder="0"
+              scrolling="no">
+            </iframe>
+          </div>
+        </section>
+      </div>
+    </div>
 
   <footer>
     &copy; 2025 Twoje Imię – Projekt w stylu Hearthstone 🔥
