@@ -693,3 +693,51 @@ button:hover {
   font-size: 1rem;
   line-height: 1.5;
 }
+
+/* Podstawowy styl dla input file */
+input[type="file"] {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  padding: 0.7rem 1rem;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  background-color: #222; /* ciemne tło jeśli masz dark mode */
+  color: #eee;
+  font-size: 1rem;
+  margin: 1rem 0;
+  cursor: pointer;
+}
+
+/* Styl dla hover */
+input[type="file"]:hover {
+  border-color: #aaa;
+}
+
+/* Styl na telefonach */
+@media (max-width: 600px) {
+  input[type="file"] {
+    max-width: 100%;
+    font-size: 1.1rem;
+    padding: 1rem;
+  }
+}
+
+.custom-file-upload {
+  display: inline-block;
+  padding: 0.7rem 1rem;
+  background-color: #333;
+  color: #eee;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.custom-file-upload:hover {
+  background-color: #444;
+}
+
+.custom-file-upload input[type="file"] {
+  display: none; /* ukrywamy oryginalny input */
+}
