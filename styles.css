@@ -373,23 +373,6 @@ button:hover {
     transform: scale(1.05);
   }
   
-  .note-icon::after {
-    content: attr(data-title);
-    position: absolute;
-    bottom: -1.8rem;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #2e1a0f;
-    color: #f4e8d4;
-    padding: 2px 6px;
-    font-size: 0.7rem;
-    white-space: nowrap;
-    border-radius: 4px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s ease;
-  }
-  
   .note-icon:hover::after {
     opacity: 1;
   }
@@ -695,4 +678,18 @@ button:hover {
   .calendar-wrapper {
     height: calc(100dvh - 4rem); /* dopasuj zależnie od marginesów */
   }
+}
+
+.note-image {
+  width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.note-text {
+  font-size: 1rem;
+  line-height: 1.5;
 }

@@ -24,8 +24,29 @@ const saveEditBtn = document.getElementById("save-edit-btn");
 const notesList = document.getElementById("notes-list");
 let currentNoteId = null;
 let activeNoteId = null;
+let currentNoteImage = "";
 
 const loadingScreen = document.getElementById("loading-screen");
+const modalNoteImageInput = document.getElementById("note-image-input");
+const editNoteImageInput = document.getElementById("edit-note-image-input"); // Nowy input na zdjęcie
+let editedNoteOriginalImage = ""; // Przechowuje stare zdjęcie
+const CLOUDINARY_URL = 'https://api.cloudinary.com/v1_1/doaarrwc3/image/upload';
+const CLOUDINARY_UPLOAD_PRESET = 'number1'; // ustalimy zaraz
+
+async function uploadImageToCloudinary(file) {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+
+  const res = await fetch(CLOUDINARY_URL, {
+    method: 'POST',
+    body: formData
+  });
+
+  const data = await res.json();
+  return data.secure_url; // gotowy URL obrazka
+}
+
 
 function showLoading() {
   loadingScreen.style.display = "flex";
@@ -47,21 +68,41 @@ addNoteBtn.addEventListener("click", () => {
 closeNoteModal.addEventListener("click", () => noteModal.style.display = "none");
 
 saveNoteBtn.addEventListener("click", async () => {
-  const note = {
-    title: modalNoteTitle.value.trim(),
-    content: modalNoteContent.value.trim()
-  };
+  const title = modalNoteTitle.value.trim();
+  const content = modalNoteContent.value.trim();
+  
+  let imageURL = "";
+
+  if (modalNoteImageInput.files.length > 0) {
+    const file = modalNoteImageInput.files[0];
+    imageURL = await uploadImageToCloudinary(file);
+  }
+
+  const note = { title, content, image: imageURL };
+
   await fetch(`${API_BASE}/notes`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(note)
   });
+
   noteModal.style.display = "none";
-  loadNotes();
+  location.reload();
 });
+
+// funkcja konwertująca plik na base64
+function toBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+  });
+}
 
 async function loadNotes() {
   showLoading();
+  activeNoteId = null; // reset aktywnej notatki!
   const res = await fetch(`${API_BASE}/notes`);
   const notes = await res.json();
   renderNotes(notes);
@@ -104,34 +145,70 @@ notesList.appendChild(icon);
 
 function openViewNote(note) {
   currentNoteId = note.id;
+  currentNoteImage = note.image || "";
+
   viewNoteTitle.value = note.title;
-  viewNoteContent.textContent = note.content;
+  viewNoteContent.innerHTML = "";
+
+  if (note.image) {
+    const img = document.createElement("img");
+    img.src = note.image;
+    img.alt = "Załączony obrazek";
+    img.classList.add("note-image"); // <-- dodajemy klasę CSS
+    viewNoteContent.appendChild(img);
+  }
+
+  const textContent = document.createElement("div");
+  textContent.innerHTML = note.content;
+  textContent.classList.add("note-text"); // <-- dodajemy klasę CSS
+  viewNoteContent.appendChild(textContent);
+
   viewModal.style.display = "flex";
 }
 
 closeViewModal.addEventListener("click", () => viewModal.style.display = "none");
 
+
 editNoteBtn.addEventListener("click", () => {
   editTitle.value = viewNoteTitle.value;
   editContent.value = viewNoteContent.textContent;
+  editedNoteOriginalImage = currentNoteImage; // Przechowaj istniejące zdjęcie!
   viewModal.style.display = "none";
   editModal.style.display = "flex";
 });
 
-closeEditModal.addEventListener("click", () => editModal.style.display = "none");
-
 saveEditBtn.addEventListener("click", async () => {
+  const title = editTitle.value.trim();
+  const content = editContent.value.trim();
+
+  let imageURL = editedNoteOriginalImage; // domyślnie stare zdjęcie
+
+  if (editNoteImageInput && editNoteImageInput.files && editNoteImageInput.files[0]) {
+    // Jeśli użytkownik wybrał nowe zdjęcie
+    const file = editNoteImageInput.files[0];
+    imageURL = await uploadImageToCloudinary(file);
+  }
+
   await fetch(`${API_BASE}/notes/${currentNoteId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      title: editTitle.value.trim(),
-      content: editContent.value.trim()
+      title,
+      content,
+      image: imageURL
     })
   });
+
   editModal.style.display = "none";
-  loadNotes();
+
+  // Reset inputu pliku na przyszłość
+  editNoteImageInput.value = "";
+
+  location.reload();
 });
+
+closeEditModal.addEventListener("click", () => editModal.style.display = "none");
+
 
 deleteNoteBtn.addEventListener("click", async () => {
   if (confirm("Usunąć notatkę?")) {
